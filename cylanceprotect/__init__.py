@@ -4,6 +4,7 @@ from cylanceprotect.device import Devices
 from cylanceprotect.global_list import GlobalList
 from cylanceprotect.policy import Policy
 from cylanceprotect.zone import Zone
+
 import json
 import requests
 import jwt
@@ -27,13 +28,14 @@ class CylanceProtectApi(object):
         self.timeout = timeout
         self.scp = scp
         self.url = 'https://protectapi.%s.cylance.com' % region_code
-        self._token = self.authentication_token()
-        self.threat = Threats(self._token, self.url)
-        self.user = Users(self._token, self.url)
-        self.device = Devices(self._token, self.url)
-        self.global_list = GlobalList(self._token, self.url)
-        self.policy = Policy(self._token, self.url)
-        self.zone = Zone(self._token, self.url)
+
+    def set_token(self, token):
+        Threats(token, self.url)
+        Users(token, self.url)
+        Devices(token, self.url)
+        GlobalList(token, self.url)
+        Policy(token, self.url)
+        Zone(token, self.url)
 
     def authentication_token(self):
         ''' Authentication Token contains the ID of the Application to which a client system is requesting access.
@@ -70,6 +72,9 @@ class CylanceProtectApi(object):
             payload = {"auth_token": encoded.decode('utf-8')}
             headers = {"Content-Type": "application/json; charset=utf-8"}
             resp = requests.post(auth_url, headers=headers, data=json.dumps(payload))
-            return json.loads(resp.text)['access_token']
+            if resp.status_code == 200:
+                return json.loads(resp.text)['access_token']
+            else:
+                return resp
         else:
             logging.error("Your time must be 30 min or less")
