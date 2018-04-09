@@ -28,14 +28,20 @@ class CylanceProtectApi(object):
         self.timeout = timeout
         self.scp = scp
         self.url = 'https://protectapi.%s.cylance.com' % region_code
+        self.threat =Threats(url=self.url, token=None)
+        self.fusers = Users(url=self.url, token=None)
+        self.device = Devices(url=self.url, token=None)
+        self.global_list = GlobalList(url=self.url, token=None)
+        self.policy = Policy(url=self.url, token=None)
+        self.zone = Zone(url=self.url, token=None)
 
     def set_token(self, token):
-        Threats(token, self.url)
-        Users(token, self.url)
-        Devices(token, self.url)
-        GlobalList(token, self.url)
-        Policy(token, self.url)
-        Zone(token, self.url)
+        self.threat = Threats(url=self.url, token=token)
+        self.fusers = Users(url=self.url, token=token)
+        self.device = Devices(url=self.url, token=token)
+        self.global_list = GlobalList(url=self.url, token=token)
+        self.policy = Policy(url=self.url, token=token)
+        self.zone = Zone(url=self.url, token=token)
 
     def authentication_token(self):
         ''' Authentication Token contains the ID of the Application to which a client system is requesting access.
